@@ -36,7 +36,7 @@
                 <td data-label="Updated At">{{ report.updatedAt|date('Y-m-d H:i:s') }}</td>
                 <td>
                     <a href="{{ path('invoice_report_error', {reportId: report.id}) }}" class="button secondary">Errors</a>
-                    <a href="#" class="button tertiary">Invoices</a>
+                    <a href="{{ path('invoice_list_by_report', {reportId: report.id}) }}" class="button tertiary">Invoices</a>
                 </td>
             </tr>
         {% endfor %}

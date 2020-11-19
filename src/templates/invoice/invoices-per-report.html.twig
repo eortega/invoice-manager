@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Invoice per Report{% endblock %}
+{% block sidebar %}
+    <nav>
+        <span>Invoice Report</span>
+        <a href="{{ path('invoice_report_new') }}" class="sublink-1">Upload New Report</a>
+    </nav>
+{% endblock %}
+
+{% block content %}
+
+    <table class="striped">
+        <caption>Invoices for report id {{ report_id }}</caption>
+        <thead>
+        <tr>
+            <th>Number</th>
+            <th>Amount</th>
+            <th>Selling Price</th>
+            <th>Due On</th>
+            <th>Created At</th>
+            <th>Updated At</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for invoice in records %}
+            <tr>
+                <td data-label="Number">{{ invoice.number|e }}</td>
+                <td data-label="Amount">{{ invoice.amount|format_currency('EUR', {fraction_digit: 2}) }}</td>
+                <td data-label="Selling Price">{{ invoice.sellingPrice|format_currency('EUR', {fraction_digit: 2}) }}</td>
+                <td data-label="Due On">{{ invoice.dueOn|date('Y-m-d') }}</td>
+                <td data-label="Created At">{{ invoice.createdAt|date('Y-m-d H:i:s') }}</td>
+                <td data-label="Updated At">{{ invoice.updatedAt|date('Y-m-d H:i:s') }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
