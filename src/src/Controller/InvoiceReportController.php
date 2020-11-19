@@ -7,6 +7,7 @@ use App\Entity\InvoiceReport;
 use App\Entity\InvoiceReportError;
 use App\Form\InvoiceReportForm;
 use App\Message\InvoiceReportMessage;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -23,8 +24,29 @@ class InvoiceReportController extends AbstractController
      */
     public function index(): Response
     {
+        $em = $this->getDoctrine()->getManager();
+        $reports = $em->getRepository(InvoiceReport::class);
+        $page = 1;
+        // build the query for the doctrine paginator
+        $query = $reports->createQueryBuilder('r')
+            ->orderBy('r.id', 'DESC')
+            ->getQuery();
+
+        $pageSize = '50';
+        $paginator = new Paginator($query);
+
+        $totalItems = count($paginator);
+        $pagesCount = ceil($totalItems / $pageSize);
+
+        $paginator
+            ->getQuery()
+            ->setFirstResult($pageSize * ($page-1)) // set the offset
+            ->setMaxResults($pageSize); // set the limit
+
         return $this->render('invoice_report/index.html.twig', [
-            'controller_name' => 'InvoiceReportController',
+            'totalItems' => $totalItems,
+            'pagesCount' => $pagesCount,
+            'records' => $paginator
         ]);
     }
 
@@ -70,44 +92,4 @@ class InvoiceReportController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-
-    /**
-     * @Route("/invoice-report/test", name="invoice_report_new_test")
-     */
-    public function createProduct(): Response
-    {
-        // you can fetch the EntityManager via $this->getDoctrine()
-        // or you can add an argument to the action: createProduct(EntityManagerInterface $entityManager)
-        $entityManager = $this->getDoctrine()->getManager();
-
-        $report = new InvoiceReport();
-        $report->setFileName('november');
-        $report->setRecords(19);
-
-
-
-        // tell Doctrine you want to (eventually) save the Product (no queries yet)
-        $entityManager->persist($report);
-        $reportError = new InvoiceReportError();
-        $reportError->setInvoiceReportId($report);
-        $reportError->setData("{}");
-        $reportError->setLine(2312);
-        $reportError->setError('Empty_Data');
-
-        $invoice = new Invoice();
-        $invoice->setNumber('A-24');
-        $invoice->setAmount(1255);
-        $invoice->setSellingPrice(1355);
-        $invoice->setDueOn(new \DateTime('2019-01-09'));
-        $invoice->setInvoiceReportId($report);
-
-        $entityManager->persist($reportError);
-        $entityManager->persist($invoice);
-
-        // actually executes the queries (i.e. the INSERT query)
-        $entityManager->flush();
-
-        return new Response('Saved new Invoice Report with id '.$report->getId());
-    }
-
 }
