@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Invoice Report Errors{% endblock %}
+{% block sidebar %}
+    <nav>
+        <span>Invoice Report</span>
+        <a href="{{ path('invoice_report_new') }}" class="sublink-1">Upload New Report</a>
+    </nav>
+{% endblock %}
+
+{% block content %}
+
+    <table class="striped">
+        <caption>Errors for report id {{ report_id }}</caption>
+        <thead>
+        <tr>
+            <th>Error</th>
+            <th>Line</th>
+            <th>Data</th>
+            <th>Created At</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for error in records %}
+            <tr>
+                <td data-label="Error">{{ error.error|e }}</td>
+                <td data-label="Line">{{ error.line|e }}</td>
+                <td data-label="Data"><pre>{{ error.data|e }}</pre></td>
+                <td data-label="Created At">{{ error.createdAt|date('Y-m-d H:i:s') }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
